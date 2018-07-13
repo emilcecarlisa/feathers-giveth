@@ -24,6 +24,7 @@ export default class {
     this.txMonitor = txMonitor;
     this.liquidPledging = liquidPledging;
     this.events = app.service('events');
+    this.transactions = app.service('transactions');
 
     this.requiredConfirmations = opts.requiredConfirmations || 0;
     this.currentBlock = 0;
@@ -259,6 +260,7 @@ export default class {
    * @param {object} event the web3 log to process
    * @param {boolean} reprocess reprocess this event if it has already been confirmed?
    */
+
   async processNewEvent(hash, event, reprocess) {
     const { id, raw } = event;
     const data = await this.events.find({ paginate: false, query: { id } });
@@ -266,6 +268,8 @@ export default class {
     // this is a new event so we create it
     if (data.length === 0) {
       await this.events.create(Object.assign({}, event, { confirmations: 0 }));
+      // await this.transactions.create(Object.assign({}, event));
+
       this.newEventQueue.purge(hash);
       // await this.eventQueue.purge(hash);
       return;
@@ -391,12 +395,14 @@ export default class {
         this.admins.updateDelegate(event);
         break;
       case 'ProjectAdded':
+        // this.transactions.create(Object.assign({}, event));
         this.admins.addProject(event);
         break;
       case 'ProjectUpdated':
         this.admins.updateProject(event);
         break;
       case 'CancelProject':
+        // this.transactions.create(Object.assign({}, event));
         this.admins.cancelProject(event);
         break;
       case 'Transfer':

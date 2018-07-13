@@ -242,6 +242,12 @@ class Admins {
     const projectId = event.returnValues.idProject;
     const txHash = event.transactionHash;
 
+    const transactions = this.app.service('transactions');
+    const pledgeAdmin = this.app.service('pledgeAdmins').get(projectId);
+
+    const projectType = pledgeAdmin ? pledgeAdmin.type : '';
+    transactions.create(Object.assign({ userAction: 'Cancel <insert action>', userRole: '<insert actor>', projectType: projectType }, event));
+
     return this.getAndSetAppBases().then(() =>
       this.liquidPledging
         .getPledgeAdmin(projectId)
@@ -383,6 +389,10 @@ class Admins {
 
   _addCampaign(project, projectId, txHash, retry = false) {
     const campaigns = this.app.service('/campaigns');
+    // const transactions = this.app.service('transactions');
+    // const pledgeAdmin = this.app.service('pledgeAdmins').get(txHash).get(id);
+    // const projectType = pledgeAdmin ? pledgeAdmin.type : '';
+    // transactions.create(Object.assign({ userAction: 'Cancel Campaign', userRole: 'Campaign Manager', projectType: projectType }, event)),
 
     // get_or_create campaign by title and ownerAddress
     const findCampaign = () =>
@@ -561,12 +571,22 @@ class Admins {
       });
   }
 
-  cancelProject(event) {
+  async cancelProject(event) {
     if (event.event !== 'CancelProject')
       throw new Error('cancelProject only handles CancelProject events');
 
     const projectId = event.returnValues.idProject;
 
+    const transactions = this.app.service('transactions');
+    // const newTrans = transactions.create(Object.assign({}, event));
+
+// await (async) or .then (callback) cause its a promise
+    const pledgeAdmin = await this.app.service('pledgeAdmins').get(projectId);
+    const projectType = pledgeAdmin ? pledgeAdmin.type : '';
+
+    transactions.create(Object.assign({ userAction: 'Cancel Campaign', userRole: 'Campaign Manager', projectType: projectType }, event))
+
+// can reuse pledgeAdmin from above
     return this.app
       .service('pledgeAdmins')
       .get(projectId)
@@ -574,6 +594,7 @@ class Admins {
         let service;
         if (pledgeAdmin.type === 'campaign') {
           service = this.app.service('campaigns');
+
           // cancel all milestones
           this.app
             .service('milestones')
@@ -582,8 +603,7 @@ class Admins {
               {
                 status: 'Canceled',
                 mined: true,
-                txHash: event.transactionHash,
-              },
+                txHash: event.transactionHash,              },
               {
                 query: {
                   campaignId: pledgeAdmin.typeId,

@@ -2,6 +2,8 @@ import challenges from './challenges/challenges.service';
 import pledgeAdmins from './pledgeAdmins/pledgeAdmins.service';
 import donationsHistory from './donationsHistory/donationsHistory.service';
 import events from './events/events.service';
+import transactions from './transactions/transactions.service';
+
 
 const dacs = require('./dacs/dacs.service.js');
 const milestones = require('./milestones/milestones.service.js');
@@ -14,6 +16,7 @@ const gasprice = require('./gasprice/gasprice.service.js');
 const ethconversion = require('./ethconversion/ethconversion.service.js');
 
 const conversations = require('./conversations/conversations.service.js');
+
 
 module.exports = function() {
   const app = this;
@@ -31,4 +34,5 @@ module.exports = function() {
   app.configure(ethconversion);
   app.configure(events);
   app.configure(conversations);
+  app.configure(transactions);
 };
