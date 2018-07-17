@@ -1,9 +1,6 @@
-import challenges from './challenges/challenges.service';
-import pledgeAdmins from './pledgeAdmins/pledgeAdmins.service';
-import donationsHistory from './donationsHistory/donationsHistory.service';
-import events from './events/events.service';
-import transactions from './transactions/transactions.service';
-
+const challenges = require('./challenges/challenges.service');
+const pledgeAdmins = require('./pledgeAdmins/pledgeAdmins.service');
+const events = require('./events/events.service');
 
 const dacs = require('./dacs/dacs.service.js');
 const milestones = require('./milestones/milestones.service.js');
@@ -16,6 +13,7 @@ const gasprice = require('./gasprice/gasprice.service.js');
 const ethconversion = require('./ethconversion/ethconversion.service.js');
 
 const conversations = require('./conversations/conversations.service.js');
+const transactions = require('./transactions/transactions.service');
 
 
 module.exports = function() {
@@ -25,7 +23,6 @@ module.exports = function() {
   app.configure(campaigns);
   app.configure(users);
   app.configure(uploads);
-  app.configure(donationsHistory);
   app.configure(donations);
   app.configure(challenges);
   app.configure(pledgeAdmins);
